@@ -1,0 +1,677 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Platform Iuran Bulanan</title>
+    <style>
+        /* CSS Styling */
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 0;
+            background-color: #f5f5f5;
+            color: #333;
+        }
+        
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        header {
+            background-color: #27ae60;
+            color: white;
+            padding: 20px 0;
+            text-align: center;
+            border-radius: 5px;
+            margin-bottom: 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        h1 {
+            margin: 0;
+            flex-grow: 1;
+        }
+        
+        .auth-section {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+        
+        .stats {
+            display: flex;
+            justify-content: space-around;
+            background-color: #2ecc71;
+            color: white;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 30px;
+        }
+        
+        .stat-box {
+            text-align: center;
+        }
+        
+        .stat-number {
+            font-size: 2.5em;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        
+        .members-list {
+            background-color: white;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            padding: 20px;
+            margin-bottom: 30px;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        th, td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+        
+        th {
+            background-color: #f2f2f2;
+            font-weight: bold;
+        }
+        
+        tr:hover {
+            background-color: #f9f9f9;
+        }
+        
+        .paid {
+            color: #27ae60;
+            font-weight: bold;
+        }
+        
+        .unpaid {
+            color: #e74c3c;
+            font-weight: bold;
+        }
+        
+        .payment-form {
+            background-color: white;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            padding: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .form-group {
+            margin-bottom: 15px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        
+        input, select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+        
+        button {
+            background-color: #27ae60;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 1em;
+        }
+        
+        button:hover {
+            background-color: #219653;
+        }
+        
+        button.logout {
+            background-color: #e74c3c;
+        }
+        
+        button.logout:hover {
+            background-color: #c0392b;
+        }
+        
+        button.guest {
+            background-color: #3498db;
+        }
+        
+        button.guest:hover {
+            background-color: #2980b9;
+        }
+        
+        footer {
+            text-align: center;
+            margin-top: 30px;
+            padding: 20px;
+            color: #777;
+        }
+        
+        .month-selector {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .month-title {
+            font-size: 1.5em;
+            font-weight: bold;
+        }
+        
+        .login-form {
+            max-width: 400px;
+            margin: 50px auto;
+            background-color: white;
+            padding: 30px;
+            border-radius: 5px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .login-form h2 {
+            margin-top: 0;
+            text-align: center;
+        }
+        
+        .hidden {
+            display: none;
+        }
+        
+        .admin-only {
+            border-left: 4px solid #27ae60;
+            padding-left: 10px;
+            margin-bottom: 15px;
+        }
+        
+        .error-message {
+            color: #e74c3c;
+            margin-top: 10px;
+            text-align: center;
+        }
+        
+        .login-options {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 20px;
+        }
+        
+        .login-options button {
+            width: 48%;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div id="loginSection" class="login-form">
+            <h2>Login ke Sistem Iuran</h2>
+            <form id="loginForm">
+                <div class="form-group">
+                    <label for="username">Username</label>
+                    <input type="text" id="username" required>
+                </div>
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <input type="password" id="password" required>
+                </div>
+                <div id="loginError" class="error-message hidden"></div>
+                <button type="submit">Login sebagai Admin</button>
+                
+                <div class="login-options">
+                    <button type="button" id="guestLoginBtn" class="guest">Masuk sebagai Tamu</button>
+                </div>
+            </form>
+        </div>
+        
+        <div id="appContent" class="hidden">
+            <header>
+                <h1>Platform Iuran Bulanan</h1>
+                <div class="auth-section">
+                    <span id="userGreeting"></span>
+                    <button id="logoutBtn" class="logout">Logout</button>
+                </div>
+            </header>
+            
+            <p>Iuran wajib Rp10.000 per bulan per anggota</p>
+            
+            <div class="stats">
+                <div class="stat-box">
+                    <div class="stat-number" id="totalMembers">10</div>
+                    <div>Total Anggota</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-number" id="totalPaid">Rp 0</div>
+                    <div>Total Terkumpul</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-number" id="paymentPercentage">0%</div>
+                    <div>Pembayaran</div>
+                </div>
+            </div>
+            
+            <div class="month-selector">
+                <button id="prevMonth">&lt; Bulan Sebelumnya</button>
+                <div class="month-title" id="currentMonth">Juli 2023</div>
+                <button id="nextMonth">Bulan Berikutnya &gt;</button>
+            </div>
+            
+            <div class="members-list">
+                <h2>Daftar Pembayaran Iuran</h2>
+                <table id="paymentTable">
+                    <thead>
+                        <tr>
+                            <th>No</th>
+                            <th>Nama Anggota</th>
+                            <th>Status</th>
+                            <th>Tanggal Bayar</th>
+                            <th>Metode</th>
+                            <th id="actionHeader">Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody id="paymentTableBody">
+                        <!-- Data akan diisi oleh JavaScript -->
+                    </tbody>
+                </table>
+            </div>
+            
+            <div id="adminSection" class="hidden">
+                <div class="admin-only">
+                    <h3>Admin Tools</h3>
+                    <p>Hanya admin yang dapat mengakses bagian ini</p>
+                </div>
+                
+                <div class="payment-form">
+                    <h2>Konfirmasi Pembayaran</h2>
+                    <form id="paymentForm">
+                        <div class="form-group">
+                            <label for="memberSelect">Pilih Anggota</label>
+                            <select id="memberSelect" required>
+                                <option value="">-- Pilih Anggota --</option>
+                                <!-- Opsi akan diisi oleh JavaScript -->
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="paymentMethod">Metode Pembayaran</label>
+                            <select id="paymentMethod" required>
+                                <option value="Transfer Bank">Transfer Bank</option>
+                                <option value="E-Wallet">E-Wallet</option>
+                                <option value="Tunai">Tunai</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="paymentDate">Tanggal Pembayaran</label>
+                            <input type="date" id="paymentDate" required>
+                        </div>
+                        <button type="submit">Konfirmasi Pembayaran</button>
+                    </form>
+                </div>
+                
+                <div class="payment-form">
+                    <h2>Manajemen Anggota</h2>
+                    <form id="memberForm">
+                        <div class="form-group">
+                            <label for="newMemberName">Nama Anggota Baru</label>
+                            <input type="text" id="newMemberName" required>
+                        </div>
+                        <button type="submit">Tambah Anggota</button>
+                    </form>
+                </div>
+            </div>
+            
+            <footer>
+                <p>&copy; 2023 Platform Iuran Bulanan. Semua hak dilindungi.</p>
+            </footer>
+        </div>
+    </div>
+
+    <script>
+        // Data aplikasi
+        const APP_KEY = 'iuranAppData';
+        
+        // Fungsi hash password sederhana (untuk demo saja)
+        function simpleHash(str) {
+            let hash = 0;
+            for (let i = 0; i < str.length; i++) {
+                const char = str.charCodeAt(i);
+                hash = (hash << 5) - hash + char;
+                hash = hash & hash; // Convert to 32bit integer
+            }
+            return hash.toString();
+        }
+        
+        // Credential untuk admin (password di-hash)
+        const ADMIN_CREDENTIALS = {
+            username: 'admin',
+            passwordHash: simpleHash('FaaAdm123') // Password asli: admin123
+        };
+        
+        // Credential untuk tamu (view only)
+        const GUEST_CREDENTIALS = {
+            username: 'tamu',
+            passwordHash: simpleHash('') // Tidak perlu password untuk tamu
+        };
+        
+        // Fungsi untuk menyimpan data ke localStorage
+        function saveData(data) {
+            localStorage.setItem(APP_KEY, JSON.stringify(data));
+        }
+        
+        // Fungsi untuk memuat data dari localStorage
+        function loadData() {
+            const savedData = localStorage.getItem(APP_KEY);
+            if (savedData) {
+                return JSON.parse(savedData);
+            }
+            
+            // Data default dengan nama-nama yang diminta
+            return {
+                members: [
+                    { id: 1, name: "Pak Mukhlis" },
+                    { id: 2, name: "Azis" },
+                    { id: 3, name: "Reja" },
+                    { id: 4, name: "Zakky" },
+                    { id: 5, name: "Alif" },
+                    { id: 6, name: "Dude" },
+                    { id: 7, name: "Dzul" },
+                    { id: 8, name: "Fachri" },
+                    { id: 9, name: "Faras" },
+                    { id: 10, name: "Hardinal" }
+                ],
+                payments: {}
+            };
+        }
+        
+        // Inisialisasi data
+        let appData = loadData();
+        let members = appData.members;
+        let payments = appData.payments;
+        
+        // Variabel bulan saat ini (format: YYYY-MM)
+        let currentMonth = new Date().toISOString().slice(0, 7);
+        
+        // Status login
+        let currentUser = null;
+        
+        // Fungsi untuk menampilkan data bulan saat ini
+        function displayCurrentMonth() {
+            const [year, month] = currentMonth.split('-');
+            const monthNames = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", 
+                              "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
+            document.getElementById('currentMonth').textContent = `${monthNames[parseInt(month)-1]} ${year}`;
+            
+            displayPayments();
+            updateStats();
+            populateMemberSelect();
+        }
+        
+        // Fungsi untuk menampilkan daftar pembayaran
+        function displayPayments() {
+            const tableBody = document.getElementById('paymentTableBody');
+            tableBody.innerHTML = '';
+            
+            const currentPayments = payments[currentMonth] || [];
+            
+            members.forEach((member, index) => {
+                const payment = currentPayments.find(p => p.memberId === member.id);
+                const row = document.createElement('tr');
+                
+                row.innerHTML = `
+                    <td>${index + 1}</td>
+                    <td>${member.name}</td>
+                    <td class="${payment ? 'paid' : 'unpaid'}">${payment ? 'Lunas' : 'Belum Bayar'}</td>
+                    <td>${payment ? payment.date : '-'}</td>
+                    <td>${payment ? payment.method : '-'}</td>
+                    <td>
+                        ${currentUser && currentUser.role === 'admin' ? 
+                            (payment ? 
+                                '<button onclick="deletePayment(' + member.id + ')">Hapus</button>' : 
+                                '<button onclick="markAsPaid(' + member.id + ')">Tandai Lunas</button>'
+                            ) : '-'
+                        }
+                    </td>
+                `;
+                
+                tableBody.appendChild(row);
+            });
+            
+            // Sembunyikan kolom aksi jika bukan admin
+            document.getElementById('actionHeader').style.display = 
+                (currentUser && currentUser.role === 'admin') ? '' : 'none';
+        }
+        
+        // Fungsi untuk memperbarui statistik
+        function updateStats() {
+            document.getElementById('totalMembers').textContent = members.length;
+            
+            const currentPayments = payments[currentMonth] || [];
+            const totalPaid = currentPayments.length * 10000;
+            const paymentPercentage = Math.round((currentPayments.length / members.length) * 100);
+            
+            document.getElementById('totalPaid').textContent = `Rp ${totalPaid.toLocaleString('id-ID')}`;
+            document.getElementById('paymentPercentage').textContent = `${paymentPercentage}%`;
+        }
+        
+        // Fungsi untuk mengisi dropdown anggota
+        function populateMemberSelect() {
+            const select = document.getElementById('memberSelect');
+            select.innerHTML = '<option value="">-- Pilih Anggota --</option>';
+            
+            const currentPayments = payments[currentMonth] || [];
+            const unpaidMembers = members.filter(member => 
+                !currentPayments.some(payment => payment.memberId === member.id)
+            );
+            
+            unpaidMembers.forEach(member => {
+                const option = document.createElement('option');
+                option.value = member.id;
+                option.textContent = member.name;
+                select.appendChild(option);
+            });
+        }
+        
+        // Fungsi untuk menandai sebagai lunas
+        function markAsPaid(memberId) {
+            if (!payments[currentMonth]) {
+                payments[currentMonth] = [];
+            }
+            
+            const today = new Date().toISOString().split('T')[0];
+            payments[currentMonth].push({
+                memberId: memberId,
+                date: today,
+                method: "Tunai" // Default method
+            });
+            
+            saveData({ members, payments });
+            displayCurrentMonth();
+        }
+        
+        // Fungsi untuk menghapus pembayaran
+        function deletePayment(memberId) {
+            if (payments[currentMonth]) {
+                payments[currentMonth] = payments[currentMonth].filter(p => p.memberId !== memberId);
+                saveData({ members, payments });
+                displayCurrentMonth();
+            }
+        }
+        
+        // Fungsi untuk mengubah bulan
+        function changeMonth(offset) {
+            const [year, month] = currentMonth.split('-').map(Number);
+            let newMonth = month + offset;
+            let newYear = year;
+            
+            if (newMonth > 12) {
+                newMonth = 1;
+                newYear++;
+            } else if (newMonth < 1) {
+                newMonth = 12;
+                newYear--;
+            }
+            
+            currentMonth = `${newYear}-${newMonth.toString().padStart(2, '0')}`;
+            displayCurrentMonth();
+        }
+        
+        // Fungsi untuk menambah anggota baru
+        function addNewMember(name) {
+            const newId = members.length > 0 ? Math.max(...members.map(m => m.id)) + 1 : 1;
+            members.push({
+                id: newId,
+                name: name
+            });
+            
+            saveData({ members, payments });
+            displayCurrentMonth();
+        }
+        
+        // Fungsi untuk login
+        function login(username, password, role) {
+            // Validasi login
+            let isValid = false;
+            let errorMessage = '';
+            
+            if (role === 'admin') {
+                const inputPasswordHash = simpleHash(password);
+                if (username === ADMIN_CREDENTIALS.username && 
+                    inputPasswordHash === ADMIN_CREDENTIALS.passwordHash) {
+                    isValid = true;
+                } else {
+                    errorMessage = 'Username atau password admin salah';
+                }
+            } else if (role === 'guest') {
+                isValid = true; // Tamu bisa login tanpa password
+            }
+            
+            if (!isValid) {
+                const errorElement = document.getElementById('loginError');
+                errorElement.textContent = errorMessage;
+                errorElement.classList.remove('hidden');
+                return false;
+            }
+            
+            // Jika login valid
+            currentUser = {
+                username: username,
+                role: role
+            };
+            
+            // Simpan status login
+            localStorage.setItem('iuranAppUser', JSON.stringify(currentUser));
+            
+            // Update UI
+            document.getElementById('loginSection').classList.add('hidden');
+            document.getElementById('appContent').classList.remove('hidden');
+            document.getElementById('userGreeting').textContent = `Halo, ${username}`;
+            
+            if (role === 'admin') {
+                document.getElementById('adminSection').classList.remove('hidden');
+            } else {
+                document.getElementById('adminSection').classList.add('hidden');
+            }
+            
+            // Set tanggal pembayaran ke hari ini
+            document.getElementById('paymentDate').value = new Date().toISOString().split('T')[0];
+            displayCurrentMonth();
+            
+            return true;
+        }
+        
+        // Fungsi untuk logout
+        function logout() {
+            currentUser = null;
+            localStorage.removeItem('iuranAppUser');
+            document.getElementById('loginSection').classList.remove('hidden');
+            document.getElementById('appContent').classList.add('hidden');
+            document.getElementById('username').value = '';
+            document.getElementById('password').value = '';
+            document.getElementById('loginError').classList.add('hidden');
+        }
+        
+        // Event Listeners
+        document.getElementById('loginForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            
+            login(username, password, 'admin');
+        });
+        
+        document.getElementById('guestLoginBtn').addEventListener('click', function() {
+            login('tamu', '', 'guest');
+        });
+        
+        document.getElementById('paymentForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const memberId = parseInt(document.getElementById('memberSelect').value);
+            const method = document.getElementById('paymentMethod').value;
+            const date = document.getElementById('paymentDate').value;
+            
+            if (!payments[currentMonth]) {
+                payments[currentMonth] = [];
+            }
+            
+            payments[currentMonth].push({
+                memberId: memberId,
+                date: date,
+                method: method
+            });
+            
+            this.reset();
+            document.getElementById('paymentDate').value = new Date().toISOString().split('T')[0];
+            saveData({ members, payments });
+            displayCurrentMonth();
+        });
+        
+        document.getElementById('memberForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const name = document.getElementById('newMemberName').value.trim();
+            if (name) {
+                addNewMember(name);
+                this.reset();
+            }
+        });
+        
+        document.getElementById('prevMonth').addEventListener('click', () => changeMonth(-1));
+        document.getElementById('nextMonth').addEventListener('click', () => changeMonth(1));
+        document.getElementById('logoutBtn').addEventListener('click', logout);
+        
+        // Cek login saat pertama kali load
+        const savedUser = localStorage.getItem('iuranAppUser');
+        if (savedUser) {
+            const user = JSON.parse(savedUser);
+            if (user.role === 'admin') {
+                // Coba login sebagai admin
+                document.getElementById('username').value = user.username;
+            } else {
+                // Login sebagai tamu
+                login(user.username, '', 'guest');
+            }
+        }
+        
+        // Inisialisasi tampilan
+        document.getElementById('paymentDate').value = new Date().toISOString().split('T')[0];
+        displayCurrentMonth();
+    </script>
+</body>
+</html>
